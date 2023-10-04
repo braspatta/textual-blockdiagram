@@ -14,6 +14,7 @@ from typing import Deque, List, Tuple, Union,Dict
 from textual.reactive import var
 import sys
 import os
+from pathlib import Path
 
 from rich.style import Style
 
@@ -272,7 +273,7 @@ class FileDialog(Widget):
 
     #---------------------------------------------------------------------------------------
     def compose(self) -> ComposeResult:
-        self.base_dir = "./" if len(sys.argv) < 2 else sys.argv[1]
+        self.get_path()
         with Container(id="top-container"):
             with Container(id="title-container"):
                 yield Label(self.dialog_label)
@@ -284,19 +285,19 @@ class FileDialog(Widget):
                 yield Button(id="cancel-btn", label ="Cancel")
 
     #---------------------------------------------------------------------------------------
+    def get_path(self):
+        sel_path = "./" if len(sys.argv) < 2 else sys.argv[1]
+        self.base_dir = Path(sel_path).resolve()
+
+    #---------------------------------------------------------------------------------------
     def watch_show_tree(self, show_tree: bool) -> None:
         """Called when show_tree is modified."""
         self.set_class(show_tree, "-show-tree")
 
     #---------------------------------------------------------------------------------------
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
-        # str(event.path)
-        if self.base_dir == "./":
-            full_dir = os.getcwd()
-        else:
-            full_dir = self.base_dir
-
-        self.query_one(Input).value = f"{full_dir}/{str(event.path)}"
+        """Event handler called when a file is selected."""
+        self.query_one(Input).value = f"{str(event.path)}"
 
     #---------------------------------------------------------------------------------------
     def on_button_pressed(self, event: Button.Pressed) -> None:
