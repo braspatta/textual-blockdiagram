@@ -1,0 +1,55 @@
+
+BlockDiagramApp #main-container {
+  layout: grid;
+  grid-size: 2 2;
+  grid-columns: 21 1fr;
+  grid-rows: 15fr 1;
+  grid-gutter: 0;
+}
+
+
+BlockDiagramApp  #main-container #side-bar {
+    width: auto;
+    height: 100%;
+    /* background: rgba(27, 36, 161, 0.192); */
+}
+
+.menu-group {
+    layout: grid;
+    grid-size: 1;
+    border: heavy white;
+    grid-gutter: 0;
+}
+
+.tool-btn {
+  width: 4;
+  height: 5;
+  /* border: none; */
+}
+
+
+#status-bar {
+  height: auto;
+  width: 100%;
+  /* background: rgba(9, 255, 0, 0.192); */
+  column-span: 2;
+}
+
+BlockDiagramApp #work-area {
+  height: 100%;
+  width: 100%;
+  /* border: round rgb(20, 156, 43); */
+}
+
+#canvas {
+  min-height: 100%;
+  min-width: 100%;
+  background: rgba(32, 32, 32, 0.329);
+}
+
+#canvas-scroll {
+  height: auto;
+  width: auto;
+  min-height: 100%;
+  min-width: 100%;
+}
