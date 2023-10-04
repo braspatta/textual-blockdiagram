@@ -11,6 +11,7 @@ from rich.console import RenderableType
 from rich.style import Style
 from rich.syntax import Syntax
 from typing import Deque, List, Tuple, Union
+from textual.css.query import NoMatches
 
 from _canvas import *
 from _menus import *
@@ -38,14 +39,14 @@ class BlockDiagramApp(App, inherit_bindings=False):
         with Container(id="main-container"):
             with Vertical(id="side-bar"):
                 with Container(classes="menu-group"):
-                    yield Button(classes="tool-btn", id="save",             label ="Save\nDiagram")
-                    yield Button(classes="tool-btn", id="open",             label ="Open\nDiagram")
-                    yield Button(classes="tool-btn", id="text-hor",         label ="Text\n   ⇒")
-                    yield Button(classes="tool-btn", id="text-ver",         label ="Text\n   ⇓")
-                    yield Button(classes="tool-btn", id="select",           label = "┌╌╌┐\n ╎⇱ ╎\n └╌╌┘")
-                    yield Button(classes="tool-btn", id="eraser",           label = "┏━━┓\n ┃✘ ┃\n ┗━━┛")
+                    yield Button(classes="tool-btn", id="save",             label ="Save")
+                    yield Button(classes="tool-btn", id="open",             label ="Open")
+                    yield Button(classes="tool-btn", id="text-hor",         label ="Text ⟺")
+                    yield Button(classes="tool-btn", id="text-ver",         label ="Text ⇓")
+                    yield Button(classes="tool-btn", id="select",           label = "Select")
+                    yield Button(classes="tool-btn", id="eraser",           label = "Eraser")
                     yield Button(classes="tool-btn", id="trapezoid-ver",    label = "|\ \n | |\n |/")
-                    yield Button(classes="tool-btn", id="trapezoid-hor",    label = " ____\n /____\\")
+                    # yield Button(classes="tool-btn", id="trapezoid-hor",    label = " ____\n /____\\")
 
                 # with Horizontal(classes="menu-group"):
                 #     for i, options in enumerate(UnicodeBoxChars.get_combinations()):
@@ -75,6 +76,14 @@ class BlockDiagramApp(App, inherit_bindings=False):
                                             {"id":"arrow-corners","title":"Corner"}
                                         ]
                                     )
+                    yield ComplexMenu(id="line-menu",
+                                        buttons=[
+                                                {"id":"line-cmd","label":"Line"}
+                                            ],
+                                        option_lists=[
+                                            {"id":"line-patterns","title":"Pattern"},
+                                        ]
+                                    )
 
             with Container(id="work-area"):
                 with ScrollableContainer(id="canvas-scroll"):
@@ -95,17 +104,17 @@ class BlockDiagramApp(App, inherit_bindings=False):
         self.query_one("#select",       Button).tooltip = "Select area"
         self.query_one("#eraser",       Button).tooltip = "Erase character"
         self.query_one("#trapezoid-ver",Button).tooltip = "Draw vertical trapezoid"
-        self.query_one("#trapezoid-hor",Button).tooltip = "Draw horizontal trapezoid"
+        # self.query_one("#trapezoid-hor",Button).tooltip = "Draw horizontal trapezoid"
 
 
         for arrow_head_type in UnicodeBoxChars.ARROWS.keys():
             self.query_one("#arrow-heads", OptionList).add_option(Option(UnicodeBoxChars.get_arrow_char(arrow_head_type,"r") ,id=arrow_head_type))
 
-        for menu_id in ["arrow","box"]:
+        for menu_id in ["arrow","box", "line"]:
             for i, (line_style, line_type, line_weight, line_char) in enumerate(UnicodeBoxChars.get_line_types()):
                 self.query_one(f"#{menu_id}-patterns", OptionList).add_option(Option(line_char ,id=str((line_style, line_type, line_weight))))
 
-                if i == 0:
+                if i == 0 and menu_id in ["arrow","box"]:
                     for corner in UnicodeBoxChars.get_corner_types(line_style,line_weight):
                                 self.query_one(f"#{menu_id}-corners", OptionList).add_option(Option(UnicodeBoxChars.get_box_char(line_style,"",line_weight,corner,"bl") ,id=corner))
 
@@ -143,8 +152,8 @@ class BlockDiagramApp(App, inherit_bindings=False):
         elif button_id == "eraser":
             canvas.set_command(cmd =  "eraser", char_set =   None )
 
-        elif button_id == "trapezoid-hor":
-            canvas.set_command(cmd =  "trapezoid-hor", char_set =   UnicodeBoxChars.get_char_set("SINGLE","CONTINUOUS", "SQUARE", "LIGHT") )
+        # elif button_id == "trapezoid-hor":
+        #     canvas.set_command(cmd =  "trapezoid-hor", char_set =   UnicodeBoxChars.get_char_set("SINGLE","CONTINUOUS", "SQUARE", "LIGHT") )
 
         elif button_id == "trapezoid-ver":
             canvas.set_command(cmd =  "trapezoid-ver", char_set =   UnicodeBoxChars.get_char_set("SINGLE","CONTINUOUS", "SQUARE", "LIGHT") )
@@ -165,6 +174,10 @@ class BlockDiagramApp(App, inherit_bindings=False):
             line_style, line_type, line_weight = list(eval(self.query_one("#box-menu",ComplexMenu).get_selected_option("box-patterns").id))
             corner_type = self.query_one("#box-menu",ComplexMenu).get_selected_option("box-corners").id
             canvas.set_command(cmd =  "box", char_set =   UnicodeBoxChars.get_char_set(line_style, line_type,corner_type,  line_weight))
+
+        elif button_id == "line-cmd":
+            line_style, line_type, line_weight = list(eval(self.query_one("#line-menu",ComplexMenu).get_selected_option("line-patterns").id))
+            canvas.set_command(cmd =  "line", char_set =   UnicodeBoxChars.get_char_set(line_style, line_type,"SQUARE",  line_weight))
 
 
         elif button_id == self.query_one("#save-file",FileDialog).action_button_id:
@@ -195,11 +208,15 @@ class BlockDiagramApp(App, inherit_bindings=False):
                 if "-patterns" in option_list.id:
                     menu_id = option_list.id.split("-")[0]
                     line_style, line_type, line_weight = list(eval(command_id))
-                    print(line_style, line_type, line_weight)
+                    # print(line_style, line_type, line_weight)
 
-                    self.query_one(f"#{menu_id}-corners", OptionList).clear_options()
-                    for corner in UnicodeBoxChars.get_corner_types(line_style,line_weight):
-                        self.query_one(f"#{menu_id}-corners", OptionList).add_option(Option(UnicodeBoxChars.get_box_char(line_style,"",line_weight,corner,"bl") ,id=corner))
+                    try:
+                        corner_menu = self.query_one(f"#{menu_id}-corners", OptionList)
+                        corner_menu.clear_options()
+                        for corner in UnicodeBoxChars.get_corner_types(line_style,line_weight):
+                            corner_menu.add_option(Option(UnicodeBoxChars.get_box_char(line_style,"",line_weight,corner,"bl") ,id=corner))
+                    except NoMatches:
+                        pass
 
 
 if __name__ == "__main__":

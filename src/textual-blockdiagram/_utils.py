@@ -13,6 +13,9 @@ class UnicodeBoxChars():
     SINGLE_CONT             = { "LIGHT" : {"h" : (0x2500, "─", "BOX_DRAWINGS_LIGHT_HORIZONTAL"),                "v" : (0x2502, "│", "BOX_DRAWINGS_LIGHT_VERTICAL")                 },
                                 "HEAVY" : {"h" : (0x2501, "━", "BOX_DRAWINGS_HEAVY_HORIZONTAL"),                "v" : (0x2503, "┃", "BOX_DRAWINGS_HEAVY_VERTICAL")                 }}
 
+    # SINGLE_WAVY             = { "LIGHT" : {"h" : (0x007E, "~", "TILDE"),                                        "v" : (0x0283, "ʃ", "LATIN_SMALL_LETTER_ESH")}}
+    SINGLE_WAVY             = { "LIGHT" : {"h" : (0x223F, "∿", "SINE_WAVE"),                                        "v" : (0x0283, "ʃ", "LATIN_SMALL_LETTER_ESH")}}
+
     SINGLE_CORNERS_SQUARE   = { "LIGHT" : { "tl" : (0x250C, "┌", "BOX_DRAWINGS_LIGHT_DOWN_AND_RIGHT"),          "tr" : (0x2510, "┐", "BOX_DRAWINGS_LIGHT_DOWN_AND_LEFT"),
                                             "bl" : (0x2514, "└", "BOX_DRAWINGS_LIGHT_UP_AND_RIGHT"),            "br" : (0x2518, "┘", "BOX_DRAWINGS_LIGHT_UP_AND_LEFT") },
 
@@ -31,7 +34,7 @@ class UnicodeBoxChars():
     # Lines dictionary
     LINES = { "LINE":
                     {
-                        "SINGLE" : { "DOUBLE_DASH"   : SINGLE_DOUBLE_DASH, "TRIPLE_DASH"   : SINGLE_TRIPLE_DASH, "QUADRUPLE_DASH"     : SINGLE_QUADRUPLE_DASH, "CONTINUOUS"          : SINGLE_CONT},
+                        "SINGLE" : { "DOUBLE_DASH" : SINGLE_DOUBLE_DASH, "TRIPLE_DASH": SINGLE_TRIPLE_DASH, "QUADRUPLE_DASH": SINGLE_QUADRUPLE_DASH, "CONTINUOUS" : SINGLE_CONT, "WAVY" : SINGLE_WAVY},
                         "DOUBLE" : { "CONT"          : DOUBLE_CONT}
                     },
              "CORNER":
