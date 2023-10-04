@@ -204,12 +204,12 @@ class BlockDiagramApp(App, inherit_bindings=False):
                 command_id = event.option.id #.replace("_"," ")
                 status_bar.update(f"{command_id} selected")
 
+                menu_id = option_list.id.split("-")[0]
+
                 # selects the corner based on the selected pattern
                 if "-patterns" in option_list.id:
-                    menu_id = option_list.id.split("-")[0]
                     line_style, line_type, line_weight = list(eval(command_id))
                     # print(line_style, line_type, line_weight)
-
                     try:
                         corner_menu = self.query_one(f"#{menu_id}-corners", OptionList)
                         corner_menu.clear_options()
@@ -217,6 +217,11 @@ class BlockDiagramApp(App, inherit_bindings=False):
                             corner_menu.add_option(Option(UnicodeBoxChars.get_box_char(line_style,"",line_weight,corner,"bl") ,id=corner))
                     except NoMatches:
                         pass
+
+                # mimics the button press when selecting an option
+                menu_button = self.query_one(f"#{menu_id}-cmd", Button)
+                self.post_message(Button.Pressed(button=menu_button))
+
 
 
 if __name__ == "__main__":
