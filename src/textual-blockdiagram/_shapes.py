@@ -116,13 +116,13 @@ class Arrow(Shape):
         # self.parent.log(f" start_col = {start_col} start_row = {start_row} \nend_col   = {end_col  } end_row   = {end_row  } ")
 
         if start_row == end_row:
-            self.draw_hline(col = min(start_col, end_col) + 1, row = start_row, length =  abs(end_col - start_col), char=self.char_set["h"], char_type="bh")
+            self.draw_hline(col = min(start_col, end_col) + 1, row = start_row, length =  abs(end_col - start_col), char=self.char_set["h"], char_type="ah")
             head = "►" if start_col < end_col else "◄"
             type = ">" if start_col < end_col else "<"
             self.set_char(end_col, end_row, head, type)
 
         elif start_col == end_col:
-            self.draw_vline(col = start_col , start_row = min(start_row, end_row), length = abs(end_row - start_row), char=self.char_set["v"], char_type="bv")
+            self.draw_vline(col = start_col , start_row = min(start_row, end_row), length = abs(end_row - start_row), char=self.char_set["v"], char_type="av")
             head = "▼" if start_row < end_row else "▲"
             type = "v" if start_col < end_col else "^"
             self.set_char(end_col, end_row, head,type)
@@ -345,3 +345,14 @@ class Trapezoid(Shape):
             #     self.draw_hline(col = event.col + width // 3, row = event.row , length = width//3, char=self.char_set["h"], char_type="bh")
             #     # self.draw_dline(anchor.col+1, anchor.row + 2 * (height//3), height//3, char='\\', char_type="diag")
             #     # self.draw_dline(anchor.col+width, anchor.row, height//3, char='/', char_type="diag")
+
+
+#====================================================================================================================================
+class Line(Shape):
+    def draw(self, event: Cursor, anchor: Cursor):
+        height = abs(event.row - anchor.row)
+        width  = abs(event.col - anchor.col)
+        if height > width:
+            self.draw_vline(col = anchor.col , start_row = anchor.row, length = height, char=self.char_set["v"], char_type="av")
+        else:
+            self.draw_hline(col = anchor.col , row = anchor.row, length = width, char=self.char_set["h"], char_type="ah")

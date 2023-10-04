@@ -277,6 +277,12 @@ class AsciiCanvas(Static, can_focus=True):
                     if not dynamic_mode:
                         self.shapes.append(new_shape)
 
+                if self.active_command["cmd"] == "line":
+                    new_shape = Line(self, self.active_command["char_set"],dynamic_mode)
+                    new_shape.draw(self.cursor, self.selection_anchor)
+                    if not dynamic_mode:
+                        self.shapes.append(new_shape)
+
             if event_type in ("down", "move"):
                 if self.active_command["cmd"] == "eraser":
                     self.active_buffer  = self.drawing_buffer
